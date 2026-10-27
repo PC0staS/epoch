@@ -88,6 +88,23 @@ impl Db {
 
         Ok(result.last_insert_rowid())
     }
+
+    pub async fn delete_snapshot(&self, id: i64) -> Result<(), DbError> {
+        sqlx::query("DELETE FROM snapshots WHERE id = ?")
+            .bind(id)
+            .execute(&self.pool)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn list_all_snapshots(&self) -> Result<Vec<SnapshotSummary>, DbError> {
+        let snapshots = sqlx::query_as::<_, SnapshotSummary>(
+            "SELECT id, url, title, captured_at FROM snapshots ORDER BY captured_at DESC, id DESC",
+        )
+        .fetch_all(&self.pool)
+        .await?;
+        Ok(snapshots)
+    }
 }
 
 #[derive(Debug, sqlx::FromRow)]
