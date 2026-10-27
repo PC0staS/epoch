@@ -38,7 +38,7 @@ impl Db {
     }
     fn ensure_path(path: &Path) -> Result<(), DbError> {
         if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent).map_err(DbError::Io)?;
+            std::fs::create_dir_all(parent)?;
         }
         Ok(())
     }
