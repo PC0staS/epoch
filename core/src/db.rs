@@ -21,7 +21,7 @@ pub struct Db {
 impl Db {
     pub async fn open(path: &Path) -> Result<Self, DbError> {
         // 1
-        Self::ensure_path(path).await?;
+        Self::ensure_path(path)?;
         // 2
         let options = SqliteConnectOptions::new()
             .filename(path)
@@ -36,7 +36,7 @@ impl Db {
         // 5
         Ok(Self { pool })
     }
-    async fn ensure_path(path: &Path) -> Result<(), DbError> {
+    fn ensure_path(path: &Path) -> Result<(), DbError> {
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent).map_err(DbError::Io)?;
         }
@@ -54,10 +54,12 @@ impl Db {
     }
 
     pub async fn get_by_id(&self, id: i64) -> Result<Option<Snapshot>, DbError> {
-        let snapshot = sqlx::query_as::<_, Snapshot>("SELECT * FROM snapshots WHERE id = ?")
-            .bind(id)
-            .fetch_optional(&self.pool)
-            .await?;
+        let snapshot = sqlx::query_as::<_, Snapshot>(
+            "SELECT id, url, title, html_content, captured_at FROM snapshots WHERE id = ?",
+        )
+        .bind(id)
+        .fetch_optional(&self.pool)
+        .await?;
         Ok(snapshot)
     }
 
