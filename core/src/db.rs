@@ -12,6 +12,8 @@ pub enum DbError {
     // This error is used to wrap any errors that occur when running database migrations using sqlx.
     #[error("migrate: {0}")]
     Migrate(#[from] sqlx::migrate::MigrateError),
+    #[error("no se pudo determinar el directorio home")]
+    NoHomeDir,
 }
 
 pub struct Db {
@@ -19,6 +21,12 @@ pub struct Db {
 }
 
 impl Db {
+    pub async fn init() -> Result<Db, DbError> {
+        let home_dir = dirs::home_dir().ok_or(DbError::NoHomeDir)?;
+        let db_path = home_dir.join(".epoch").join("epoch.sqlite");
+        Self::open(&db_path).await
+    }
+
     pub async fn open(path: &Path) -> Result<Self, DbError> {
         // 1
         Self::ensure_path(path)?;
@@ -36,6 +44,7 @@ impl Db {
         // 5
         Ok(Self { pool })
     }
+
     fn ensure_path(path: &Path) -> Result<(), DbError> {
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent)?;
