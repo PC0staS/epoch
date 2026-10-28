@@ -1,5 +1,9 @@
+use chromiumoxide::{Browser, BrowserConfig};
+use futures::StreamExt;
+use std::path::PathBuf;
 use std::process::Command;
 
+#[derive(Debug)]
 pub enum BrowserKind {
     Chromium,
     Chrome,
@@ -8,12 +12,24 @@ pub enum BrowserKind {
     Unknown,
 }
 
+#[derive(Debug)]
 pub struct BrowserInfo {
     pub path: String,
     pub kind: BrowserKind,
     pub version: String,
 }
 
+#[derive(Debug, thiserror::Error)]
+pub enum BrowserError {
+    #[error("no se pudo lanzar el navegador: {0}")]
+    Launch(String),
+    #[error("error CDP: {0}")]
+    Cdp(#[from] chromiumoxide::error::CdpError),
+    #[error("timeout de {secs}s capturando {url}")]
+    Timeout { url: String, secs: u64 },
+}
+
+#[derive(Debug)]
 pub enum DetectError {
     BrowserNotFound,
     NoUsableBrowser(Vec<String>),
@@ -29,19 +45,19 @@ pub fn detect_browser(custom_browser: &str) -> Result<BrowserInfo, DetectError> 
         ("microsoft-edge-stable", BrowserKind::Edge),
         ("microsoft-edge", BrowserKind::Edge),
         ("brave-browser", BrowserKind::Brave),
+        ("brave", BrowserKind::Brave),
     ];
 
     let mut failures: Vec<String> = Vec::new();
 
     for (browser_cmd, kind) in browsers {
-        match Command::new(browser_cmd).arg("--version").output() {
+        let Some(path) = resolve_in_path(browser_cmd) else {
+            continue; // Si no se encuentra el navegador, pasamos al siguiente
+        };
+        match Command::new(&path).arg("--version").output() {
             Err(e) => {
-                if e.kind() == std::io::ErrorKind::NotFound {
-                    continue;
-                } else {
-                    failures.push(format!("{browser_cmd}: error al ejecutar: {e}"));
-                    continue;
-                }
+                failures.push(format!("{browser_cmd}: error al ejecutar: {e}"));
+                continue;
             }
 
             Ok(out) if !out.status.success() => {
@@ -58,7 +74,7 @@ pub fn detect_browser(custom_browser: &str) -> Result<BrowserInfo, DetectError> 
                 match parse_version(&raw) {
                     Some(version) => {
                         return Ok(BrowserInfo {
-                            path: browser_cmd.to_string(),
+                            path: path.display().to_string(),
                             kind,
                             version,
                         });
@@ -83,4 +99,38 @@ fn parse_version(version_str: &str) -> Option<String> {
         .split_whitespace() // Divide la cadena de versión en partes separadas por espacios.
         .find(|part| part.starts_with(|c: char| c.is_ascii_digit())) // Busca la primera parte que comienza con un dígito, que debería ser la versión.
         .map(str::to_string) // Devuelve la primera parte que comienza con un dígito, que debería ser la versión.
+}
+
+fn resolve_in_path(cmd: &str) -> Option<PathBuf> {
+    let path = std::env::var_os("PATH")?;
+    for dir in std::env::split_paths(&path) {
+        let candidate = dir.join(cmd);
+        if candidate.is_file() {
+            return Some(candidate);
+        }
+    }
+    None
+}
+
+pub async fn fetch_html(browser_info: &BrowserInfo, url: &str) -> Result<String, BrowserError> {
+    let config = BrowserConfig::builder()
+        .chrome_executable(&browser_info.path)
+        .build()
+        .map_err(BrowserError::Launch)?;
+
+    let (mut browser, mut handler) = Browser::launch(config).await?;
+
+    let handle = tokio::spawn(async move {
+        while let Some(event) = handler.next().await {
+            if event.is_err() {
+                break;
+            }
+        }
+    });
+
+    // Cerramos el navegador y esperamos a que el manejador termine
+    let _ = browser.close().await;
+    let _ = handle.await;
+
+    Ok(String::new())
 }
