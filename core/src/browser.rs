@@ -2,6 +2,10 @@ use chromiumoxide::{Browser, BrowserConfig};
 use futures::StreamExt;
 use std::path::PathBuf;
 use std::process::Command;
+use std::time::Duration;
+
+const CAPTURE_TIMEOUT: Duration = Duration::from_secs(60); // Timeout para capturar la página
+const SETTLE: Duration = Duration::from_millis(1000); // Tiempo de espera para que la página se estabilice antes de capturar el HTML
 
 #[derive(Debug)]
 pub enum BrowserKind {
@@ -128,9 +132,24 @@ pub async fn fetch_html(browser_info: &BrowserInfo, url: &str) -> Result<String,
         }
     });
 
+    let result = tokio::time::timeout(CAPTURE_TIMEOUT, async {
+        let page = browser.new_page(url).await?;
+        tokio::time::sleep(SETTLE).await;
+        let page_html = page.content().await?;
+        Ok::<String, chromiumoxide::error::CdpError>(page_html)
+    })
+    .await;
+
     // Cerramos el navegador y esperamos a que el manejador termine
     let _ = browser.close().await;
     let _ = handle.await;
 
-    Ok(String::new())
+    match result {
+        Ok(Ok(html)) => Ok(html),
+        Ok(Err(e)) => Err(e.into()),
+        Err(_) => Err(BrowserError::Timeout {
+            url: url.to_string(),
+            secs: CAPTURE_TIMEOUT.as_secs(),
+        }),
+    }
 }
