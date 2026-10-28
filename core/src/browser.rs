@@ -122,6 +122,7 @@ pub async fn fetch_html(browser_info: &BrowserInfo, url: &str) -> Result<String,
         .build()
         .map_err(BrowserError::Launch)?;
 
+    //las instrucciones se le dan al browser y se reciven eventos de vuelta en el handler.
     let (mut browser, mut handler) = Browser::launch(config).await?;
 
     let handle = tokio::spawn(async move {
