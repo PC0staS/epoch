@@ -15,7 +15,7 @@ pub enum DbError {
     #[error("no se pudo determinar el directorio home")]
     NoHomeDir,
 }
-
+#[derive(Clone)]
 pub struct Db {
     pool: SqlitePool,
 }

@@ -7,7 +7,7 @@ use std::time::Duration;
 const CAPTURE_TIMEOUT: Duration = Duration::from_secs(60); // Timeout para capturar la página
 const SETTLE: Duration = Duration::from_millis(1000); // Tiempo de espera para que la página se estabilice antes de capturar el HTML
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub enum BrowserKind {
     Chromium,
     Chrome,
@@ -16,7 +16,7 @@ pub enum BrowserKind {
     Unknown,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct BrowserInfo {
     pub path: String,
     pub kind: BrowserKind,
@@ -33,9 +33,11 @@ pub enum BrowserError {
     Timeout { url: String, secs: u64 },
 }
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum DetectError {
+    #[error("no se encontró ningún navegador Chromium-based instalado")]
     BrowserNotFound,
+    #[error("hay navegadores instalados pero ninguno arranca: {}", .0.join("; "))]
     NoUsableBrowser(Vec<String>),
 }
 
