@@ -106,8 +106,8 @@ impl Db {
         Ok(snapshots)
     }
 }
-
-#[derive(Debug, sqlx::FromRow)]
+// FromRow permite convertir SQL rows a structs, Serialize permite convertir structs a JSON.
+#[derive(Debug, sqlx::FromRow, serde::Serialize)]
 pub struct Snapshot {
     pub id: i64,
     pub url: String,
@@ -116,7 +116,7 @@ pub struct Snapshot {
     pub captured_at: chrono::DateTime<chrono::Utc>,
 }
 
-#[derive(Debug, sqlx::FromRow)]
+#[derive(Debug, sqlx::FromRow, serde::Serialize)]
 pub struct SnapshotSummary {
     pub id: i64,
     pub url: String,

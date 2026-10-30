@@ -225,6 +225,7 @@ dependencies = [
  "iana-time-zone",
  "js-sys",
  "num-traits",
+ "serde",
  "wasm-bindgen",
  "windows-link",
 ]
@@ -485,6 +486,7 @@ dependencies = [
  "dirs",
  "futures",
  "lol_html",
+ "serde",
  "sqlx",
  "thiserror",
  "tokio",
