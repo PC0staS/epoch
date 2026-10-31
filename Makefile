@@ -29,8 +29,9 @@ clippy: ## Linter de Rust
 	cargo clippy --manifest-path core/Cargo.toml -- -D warnings
 	cargo clippy --manifest-path app/src-tauri/Cargo.toml -- -D warnings
 
-publish: ## Sube la versión, commitea, etiqueta y lanza el release
-	@read -p "tag: " tag; \
+publish: ## Sube la versión, commitea, etiqueta y lanza el release (tag=vX.Y.Z)
+	@tag="$(tag)"; \
+	if [ -z "$$tag" ]; then read -p "tag: " tag; fi; \
 	case "$$tag" in \
 		v[0-9]*) ;; \
 		*) echo "el tag debe empezar por v y un número (p. ej. v1.0.0)"; exit 1 ;; \
