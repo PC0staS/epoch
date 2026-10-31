@@ -1,51 +1,53 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { useState, useEffect } from 'react'
+import './App.css'
+import { BrowserInfo, SnapshotSummary } from './models'
+import { browserStatus } from './api'
+import Loading from './Views/Loading'
+import NoBrowser from './Views/NoBrowser'
+import Home from './Views/Home'
+import Snapshot from './Views/Snapshot'
+import HistoryComponent from './Views/History'
+import Layout from './Layout'
+
+type View =
+  | { name: 'loading' }
+  | { name: 'noBrowser'; message: string }
+  | { name: 'home' }
+  | { name: 'history' }
+  | { name: 'snapshot'; id: number; from: 'home' | 'history' }
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [view, setView] = useState<View>({ name: 'loading' })
+  const [browserInfo, setBrowserInfo] = useState<BrowserInfo | null>(null)
+  const [listedSnapshots, setListedSnapshots] = useState<SnapshotSummary[]>([])
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  useEffect(() => {
+    browserStatus()
+      .then(info => {
+        setBrowserInfo(info)
+        setView({ name: 'home' })
+      })
+      .catch(err => setView({ name: 'noBrowser', message: String(err) }))
+  }, [])
 
-  return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
-  );
+  const checkBrowser = () => {
+    setView({ name: 'loading' })
+    browserStatus()
+      .then(() => setView({ name: 'home' }))
+      .catch(err => setView({ name: 'noBrowser', message: String(err) }))
+  }return <Layout children={
+  switch (view.name) {
+    case 'loading':
+      return <Loading />
+    case 'noBrowser':
+      return <NoBrowser message={view.message} onCheck={checkBrowser} />
+    case 'home':
+      return <Home listedSnapshots={listedSnapshots} setListedSnapshots={setListedSnapshots} />
+    case 'history':
+      return <HistoryComponent />
+    case 'snapshot':
+      return <Snapshot />
+  }} />
 }
 
-export default App;
+export default App
