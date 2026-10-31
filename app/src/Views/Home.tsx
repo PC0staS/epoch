@@ -38,52 +38,64 @@ export default function Home({
       })
   }
   return (
-    <div>
-      <h1>Home</h1>
-      <div>
-        <input
-          type="text"
-          placeholder="Enter URL"
-          className="border p-2 rounded w-full"
-          value={url}
-          onChange={e => setUrl(e.target.value)}
-        />
-        <button
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          onClick={handleCapture}
-        >
-          Capture
-        </button>
-      </div>
-      <button
-        className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-        onClick={handleToggleCustomPathInput}
-      >
-        Usar navegador personalizado?
-      </button>
-      {showCustomPathInput && (
-        <div className="mt-4">
+    <div className="max-w-3xl">
+      <section className="animate-rise">
+        <h2 className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink-soft">
+          nueva captura
+        </h2>
+        <div className="mt-4 flex items-end gap-4">
           <input
             type="text"
-            placeholder="Enter custom path"
-            className="border p-2 rounded w-full"
+            placeholder="https://ejemplo.com"
+            className="min-w-0 flex-1 border-b border-line bg-transparent py-3 font-mono text-lg outline-none transition-colors placeholder:text-ink-soft/50 focus:border-accent"
+            value={url}
+            onChange={e => setUrl(e.target.value)}
+          />
+          <button
+            className="shrink-0 bg-ink px-6 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-paper transition-colors hover:bg-accent"
+            onClick={handleCapture}
+          >
+            Guardar
+          </button>
+        </div>
+        <button
+          className="mt-5 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-soft underline decoration-line underline-offset-4 transition-colors hover:text-accent"
+          onClick={handleToggleCustomPathInput}
+        >
+          {showCustomPathInput ? 'usar el detectado' : 'usar otro navegador'}
+        </button>
+        {showCustomPathInput && (
+          <input
+            type="text"
+            placeholder="/usr/bin/chromium"
+            className="mt-3 w-full border-b border-line bg-transparent py-2 font-mono text-sm outline-none transition-colors placeholder:text-ink-soft/50 focus:border-accent"
             value={customPath}
             onChange={e => setCustomPath(e.target.value)}
           />
-        </div>
-      )}
+        )}
+      </section>
+
       {last5Snapshots.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Snapshots</h2>
-          <ul>
+        <section className="animate-rise mt-16" style={{ animationDelay: '120ms' }}>
+          <h2 className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink-soft">
+            últimas capturas
+          </h2>
+          <ul className="mt-4 divide-y divide-line border-y border-line">
             {last5Snapshots.map(snapshot => (
-              <li key={snapshot.id} className="mb-2">
-                <span className="font-medium">{snapshot.url}</span> -{' '}
-                <span className="text-sm text-gray-500">{snapshot.captured_at}</span>
+              <li key={snapshot.id} className="flex items-baseline gap-4 py-3">
+                <span className="w-10 shrink-0 font-mono text-[10px] tabular-nums text-ink-soft">
+                  #{snapshot.id}
+                </span>
+                <span className="min-w-0 flex-1 truncate font-display text-lg">
+                  {snapshot.title ?? snapshot.url}
+                </span>
+                <span className="shrink-0 font-mono text-[10px] uppercase tracking-widest text-ink-soft">
+                  {new Date(snapshot.captured_at).toLocaleDateString()}
+                </span>
               </li>
             ))}
           </ul>
-        </div>
+        </section>
       )}
     </div>
   )
