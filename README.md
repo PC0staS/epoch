@@ -15,7 +15,13 @@ con sus URLs relativas convertidas en absolutas.
 
 ## Instalación
 
-Descarga el paquete de la última [release](../../releases/latest):
+Arch Linux (AUR):
+
+```sh
+paru -S epoch-app-bin   # o yay -S epoch-app-bin
+```
+
+O descarga el paquete de la última [release](../../releases/latest):
 
 - **AppImage** — cualquier distro, sin instalar nada:
   ```sh

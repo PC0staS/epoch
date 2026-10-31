@@ -45,22 +45,8 @@ clippy: ## Linter de Rust
 	cargo clippy --manifest-path core/Cargo.toml -- -D warnings
 	cargo clippy --manifest-path app/src-tauri/Cargo.toml -- -D warnings
 
-publish: ## Sube la versión, commitea, etiqueta y lanza el release (tag=vX.Y.Z)
-	@tag="$(tag)"; \
-	if [ -z "$$tag" ]; then read -p "tag: " tag; fi; \
-	case "$$tag" in \
-		v[0-9]*) ;; \
-		*) echo "el tag debe empezar por v y un número (p. ej. v1.0.0)"; exit 1 ;; \
-	esac; \
-	[ -z "$$(git status --porcelain)" ] || { echo "hay cambios sin commitear"; exit 1; }; \
-	ver=$${tag#v}; \
-	sed -i -E "s/^version = \"[^\"]+\"/version = \"$$ver\"/" app/src-tauri/Cargo.toml; \
-	jq --indent 2 --arg v "$$ver" '.version = $$v' app/package.json > app/package.json.tmp && mv app/package.json.tmp app/package.json; \
-	jq --indent 2 --arg v "$$ver" '.version = $$v' app/src-tauri/tauri.conf.json > app/src-tauri/tauri.conf.json.tmp && mv app/src-tauri/tauri.conf.json.tmp app/src-tauri/tauri.conf.json; \
-	cargo metadata --manifest-path app/src-tauri/Cargo.toml --format-version 1 > /dev/null; \
-	git add app/package.json app/src-tauri/Cargo.toml app/src-tauri/Cargo.lock app/src-tauri/tauri.conf.json; \
-	git diff --cached --quiet || git commit -m "release $$tag"; \
-	git tag "$$tag" && git push origin HEAD "$$tag"
+publish: ## Sube la versión, commitea, etiqueta, lanza el release y actualiza AUR (tag=vX.Y.Z)
+	@./scripts/publish.sh $(tag)
 
 clean: ## Borra artefactos de build
 	rm -rf app/dist core/target app/src-tauri/target
