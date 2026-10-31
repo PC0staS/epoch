@@ -25,19 +25,19 @@ pub struct BrowserInfo {
 
 #[derive(Debug, thiserror::Error)]
 pub enum BrowserError {
-    #[error("no se pudo lanzar el navegador: {0}")]
+    #[error("failed to launch the browser: {0}")]
     Launch(String),
-    #[error("error CDP: {0}")]
+    #[error("CDP error: {0}")]
     Cdp(#[from] chromiumoxide::error::CdpError),
-    #[error("timeout de {secs}s capturando {url}")]
+    #[error("timeout after {secs}s capturing {url}")]
     Timeout { url: String, secs: u64 },
 }
 
 #[derive(Debug, thiserror::Error)]
 pub enum DetectError {
-    #[error("no se encontró ningún navegador Chromium-based instalado")]
+    #[error("no Chromium-based browser installed")]
     BrowserNotFound,
-    #[error("hay navegadores instalados pero ninguno arranca: {}", .0.join("; "))]
+    #[error("browsers are installed but none of them start: {}", .0.join("; "))]
     NoUsableBrowser(Vec<String>),
 }
 

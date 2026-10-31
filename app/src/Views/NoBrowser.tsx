@@ -2,9 +2,7 @@ export default function NoBrowser({ message, onCheck }: { message: string; onChe
   return (
     <div className="flex h-screen items-center justify-center px-6">
       <div className="animate-rise w-full max-w-lg border border-line bg-paper-deep p-10">
-        <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent">
-          no browser
-        </p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent">no browser</p>
         <h2 className="mt-4 font-display text-2xl leading-snug">
           Epoch needs a Chromium-based browser to capture pages.
         </h2>
@@ -13,7 +11,7 @@ export default function NoBrowser({ message, onCheck }: { message: string; onChe
           onClick={onCheck}
           className="mt-8 bg-ink px-6 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-paper transition-colors hover:bg-accent"
         >
-          Reintentar
+          Retry
         </button>
       </div>
     </div>

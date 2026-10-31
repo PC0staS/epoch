@@ -34,7 +34,7 @@ export default function UpdateNotice({
   return (
     <div className="border-t border-line pt-5">
       <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink-soft">
-        actualización
+        update
       </p>
       <p className="mt-2 font-display text-2xl leading-none">{update.version}</p>
       {canSelf ? (
@@ -43,7 +43,7 @@ export default function UpdateNotice({
           disabled={installing}
           className="mt-4 w-full border border-accent px-3 py-2 font-mono text-[10px] uppercase tracking-[0.2em] text-accent transition-colors hover:bg-accent hover:text-paper disabled:cursor-progress disabled:opacity-50"
         >
-          {installing ? 'instalando…' : 'actualizar ahora'}
+          {installing ? 'installing…' : 'update now'}
         </button>
       ) : (
         <button

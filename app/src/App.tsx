@@ -80,7 +80,7 @@ function App() {
         return selectedSnapshotId !== null ? (
           <SnapshotComponent snapshotId={selectedSnapshotId!} />
         ) : (
-          <p>Selecciona una captura en el historial</p>
+          <p>Select a snapshot in History</p>
         )
     }
   }

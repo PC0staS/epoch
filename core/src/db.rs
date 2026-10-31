@@ -12,7 +12,7 @@ pub enum DbError {
     // This error is used to wrap any errors that occur when running database migrations using sqlx.
     #[error("migrate: {0}")]
     Migrate(#[from] sqlx::migrate::MigrateError),
-    #[error("no se pudo determinar el directorio home")]
+    #[error("could not determine the home directory")]
     NoHomeDir,
 }
 #[derive(Clone)]
