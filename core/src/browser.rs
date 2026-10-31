@@ -1,6 +1,7 @@
 use chromiumoxide::{Browser, BrowserConfig};
 use futures::StreamExt;
 use std::path::PathBuf;
+#[cfg(not(target_os = "windows"))]
 use std::process::Command;
 use std::time::Duration;
 
@@ -42,7 +43,11 @@ pub enum DetectError {
 }
 
 pub fn detect_browser(custom_browser: &str) -> Result<BrowserInfo, DetectError> {
-    let mut browsers = vec![
+    #[cfg_attr(
+        not(any(target_os = "macos", target_os = "windows")),
+        allow(unused_mut)
+    )]
+    let mut browsers: Vec<(String, BrowserKind)> = vec![
         (custom_browser, BrowserKind::Chromium), // Intentamos primero con el path personalizado proporcionado
         ("chromium", BrowserKind::Chromium),
         ("chromium-browser", BrowserKind::Chromium),
@@ -52,35 +57,82 @@ pub fn detect_browser(custom_browser: &str) -> Result<BrowserInfo, DetectError> 
         ("microsoft-edge", BrowserKind::Edge),
         ("brave-browser", BrowserKind::Brave),
         ("brave", BrowserKind::Brave),
-    ];
+    ]
+    .into_iter()
+    .map(|(name, kind)| (name.to_string(), kind))
+    .collect();
 
     // Los .app de macOS no exponen sus binarios en PATH: hay que ir al bundle.
     #[cfg(target_os = "macos")]
     browsers.extend([
         (
-            "/Applications/Chromium.app/Contents/MacOS/Chromium",
+            "/Applications/Chromium.app/Contents/MacOS/Chromium".to_string(),
             BrowserKind::Chromium,
         ),
         (
-            "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
+            "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser".to_string(),
             BrowserKind::Brave,
         ),
         (
-            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome".to_string(),
             BrowserKind::Chrome,
         ),
         (
-            "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+            "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge".to_string(),
             BrowserKind::Edge,
         ),
     ]);
 
+    // En Windows los .exe no están en PATH ni se llaman como en Linux.
+    #[cfg(target_os = "windows")]
+    {
+        browsers.extend([
+            (
+                r"C:\Program Files\Google\Chrome\Application\chrome.exe".to_string(),
+                BrowserKind::Chrome,
+            ),
+            (
+                r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe".to_string(),
+                BrowserKind::Chrome,
+            ),
+            (
+                r"C:\Program Files\Microsoft\Edge\Application\msedge.exe".to_string(),
+                BrowserKind::Edge,
+            ),
+            (
+                r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe".to_string(),
+                BrowserKind::Edge,
+            ),
+        ]);
+        // Chrome "solo para mí" se instala en %LOCALAPPDATA%, no en Program Files.
+        if let Some(local) = std::env::var_os("LOCALAPPDATA") {
+            let chrome = PathBuf::from(local).join(r"Google\Chrome\Application\chrome.exe");
+            if chrome.is_file() {
+                browsers.push((chrome.display().to_string(), BrowserKind::Chrome));
+            }
+        }
+    }
+
+    #[cfg_attr(target_os = "windows", allow(unused_mut))]
     let mut failures: Vec<String> = Vec::new();
 
     for (browser_cmd, kind) in browsers {
-        let Some(path) = resolve_in_path(browser_cmd) else {
+        let Some(path) = resolve_in_path(&browser_cmd) else {
             continue; // Si no se encuentra el navegador, pasamos al siguiente
         };
+
+        // En Windows `--version` abre el navegador en vez de imprimir la versión,
+        // así que basta con que el ejecutable exista.
+        #[cfg(target_os = "windows")]
+        {
+            return Ok(BrowserInfo {
+                path: path.display().to_string(),
+                kind,
+                version: "unknown".to_string(),
+            });
+        }
+
+        #[cfg(not(target_os = "windows"))]
         match Command::new(&path).arg("--version").output() {
             Err(e) => {
                 failures.push(format!("{browser_cmd}: error al ejecutar: {e}"));
