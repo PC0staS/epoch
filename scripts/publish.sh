@@ -47,9 +47,10 @@ tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
 echo "esperando $asset en el release $tag..."
-for i in $(seq 1 60); do
-  if curl -fsSL -o "$tmp/$asset" "$asset_url"; then break; fi
-  [ "$i" -eq 60 ] && { echo "no aparece $asset tras 10 min (¿falló el CI?)"; exit 1; }
+# Ubuntu tarda ~15-20 min en compilar y subir el .deb, así que el margen es de 40.
+deadline=$((SECONDS + 2400))
+until curl -fsSL -o "$tmp/$asset" "$asset_url"; do
+  [ "$SECONDS" -ge "$deadline" ] && { echo "no aparece $asset tras 40 min (¿falló el CI?)"; exit 1; }
   sleep 10
 done
 
