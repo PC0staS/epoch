@@ -6,3 +6,5 @@ export const browserStatus = (customPath?: string) => invoke<BrowserInfo>("brows
 export const getSnapshot = (id: number) => invoke<Snapshot | null>("get_snapshot", { id });
 export const deleteSnapshot = (id: number) => invoke<void>("delete_snapshot", { id });
 export const captureUrl = (url: string, customPath?: string) => invoke<number>("capture_url", { url, customPath });
+export const canSelfUpdate = () => invoke<boolean>("can_self_update");
+export const relaunch = () => invoke<void>("relaunch");

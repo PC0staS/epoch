@@ -46,10 +46,22 @@ async fn capture_url(
         .map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+fn can_self_update() -> bool {
+    // Devuelve false si el os es linux y no se está ejecutando como AppImage, de lo contrario devuelve true
+    !cfg!(target_os = "linux") || std::env::var("APPIMAGE").is_ok()
+}
+
+#[tauri::command]
+fn relaunch(app: tauri::AppHandle) {
+    app.restart();
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             let db = tauri::async_runtime::block_on(epoch_core::db::Db::init())?;
             app.manage(db);
@@ -60,7 +72,9 @@ pub fn run() {
             list_snapshots,
             get_snapshot,
             capture_url,
-            delete_snapshot
+            delete_snapshot,
+            can_self_update,
+            relaunch
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -12,10 +12,12 @@ export default function Layout({
   panel,
   onNavigate,
   children,
+  sideBarUpdateNotice,
 }: {
   panel: PanelName
   onNavigate: (panel: { name: PanelName }) => void
   children: React.ReactNode
+  sideBarUpdateNotice?: React.ReactNode
 }) {
   return (
     <div className="flex min-h-screen flex-col bg-paper text-ink">
@@ -28,7 +30,7 @@ export default function Layout({
         </div>
       </header>
       <div className="flex min-h-0 flex-1">
-        <aside className="w-52 shrink-0 border-r border-line px-6 py-8">
+        <aside className="flex w-52 shrink-0 flex-col border-r border-line px-6 py-8">
           <nav className="flex flex-col">
             {PANELS.map((item, i) => (
               <button
@@ -48,6 +50,7 @@ export default function Layout({
               </button>
             ))}
           </nav>
+          {sideBarUpdateNotice && <div className="mt-auto">{sideBarUpdateNotice}</div>}
         </aside>
         <main className="min-h-0 flex-1 overflow-auto px-10 py-8">{children}</main>
       </div>

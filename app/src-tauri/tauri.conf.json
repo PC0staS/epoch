@@ -30,6 +30,13 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEYwNzUyQkEwMEQ5NjIzOTEKUldTUkk1WU5vQ3QxOEk1Sk9KUjJBTHdiSzM3UDBaNUhvV2FpSCtiT05PQmQvWjVLVmZhS1JhSnUK",
+      "endpoints": ["https://github.com/PC0staS/epoch/releases/latest/download/latest.json"]
+    }
   }
 }

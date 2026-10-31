@@ -8,6 +8,10 @@ import Home from './Views/Home'
 import SnapshotComponent from './Views/Snapshot'
 import HistoryComponent from './Views/History'
 import Layout from './Layout'
+import { check } from '@tauri-apps/plugin-updater'
+import type { Update } from '@tauri-apps/plugin-updater'
+import { canSelfUpdate } from './api'
+import UpdateNotice from './UpdateNotice'
 
 type Panel = { name: 'home' } | { name: 'history' } | { name: 'snapshot' }
 
@@ -20,6 +24,8 @@ function App() {
   const [view, setView] = useState<View>({ name: 'loading' })
   const [listedSnapshots, setListedSnapshots] = useState<SnapshotSummary[]>([])
   const [selectedSnapshotId, setSelectedSnapshotId] = useState<number | null>(null)
+  const [update, setUpdate] = useState<Update | null>(null)
+  const [canSelf, setCanSelf] = useState(false)
 
   useEffect(() => {
     browserStatus()
@@ -27,6 +33,15 @@ function App() {
         setView({ name: 'app', panel: { name: 'home' } })
       })
       .catch(err => setView({ name: 'noBrowser', message: String(err) }))
+  }, [])
+
+  useEffect(() => {
+    check()
+      .then(setUpdate)
+      .catch(err => console.error('Error checking for updates:', err))
+    canSelfUpdate()
+      .then(setCanSelf)
+      .catch(err => console.error('Error checking for self-update capability:', err))
   }, [])
 
   const checkBrowser = () => {
@@ -71,7 +86,11 @@ function App() {
   }
 
   return (
-    <Layout panel={view.panel.name} onNavigate={panel => setView({ name: 'app', panel })}>
+    <Layout
+      panel={view.panel.name}
+      onNavigate={panel => setView({ name: 'app', panel })}
+      sideBarUpdateNotice={<UpdateNotice update={update} canSelf={canSelf} />}
+    >
       {renderPanel()}
     </Layout>
   )
