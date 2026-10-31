@@ -24,6 +24,7 @@ jobs:
         platform:
           - ubuntu-22.04
           - macos-latest
+          - windows-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -80,6 +81,7 @@ jobs:
             - **.deb** — Debian, Ubuntu, Mint
             - **.rpm** — Fedora, openSUSE
             - **.dmg / .app** — macOS (Apple Silicon e Intel)
+            - **.msi / .exe** — Windows 10/11 (x64)
 
             Requiere glibc >= 2.35 (Ubuntu 22.04 o superior) y un navegador
             **Chromium-based** instalado (Chrome, Chromium, Edge o Brave): Epoch lo usa
