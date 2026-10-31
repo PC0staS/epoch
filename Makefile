@@ -40,7 +40,8 @@ publish: ## Sube la versión, commitea, etiqueta y lanza el release
 	sed -i -E "s/^version = \"[^\"]+\"/version = \"$$ver\"/" app/src-tauri/Cargo.toml; \
 	jq --indent 2 --arg v "$$ver" '.version = $$v' app/package.json > app/package.json.tmp && mv app/package.json.tmp app/package.json; \
 	jq --indent 2 --arg v "$$ver" '.version = $$v' app/src-tauri/tauri.conf.json > app/src-tauri/tauri.conf.json.tmp && mv app/src-tauri/tauri.conf.json.tmp app/src-tauri/tauri.conf.json; \
-	git add app/package.json app/src-tauri/Cargo.toml app/src-tauri/tauri.conf.json; \
+	cargo metadata --manifest-path app/src-tauri/Cargo.toml --format-version 1 > /dev/null; \
+	git add app/package.json app/src-tauri/Cargo.toml app/src-tauri/Cargo.lock app/src-tauri/tauri.conf.json; \
 	git commit -m "release $$tag" && git tag "$$tag" && git push origin HEAD "$$tag"
 
 clean: ## Borra artefactos de build
