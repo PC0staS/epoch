@@ -5,27 +5,28 @@ import { browserStatus } from './api'
 import Loading from './Views/Loading'
 import NoBrowser from './Views/NoBrowser'
 import Home from './Views/Home'
-import Snapshot from './Views/Snapshot'
+import SnapshotComponent from './Views/Snapshot'
 import HistoryComponent from './Views/History'
 import Layout from './Layout'
+
+type Panel = { name: 'home' } | { name: 'history' } | { name: 'snapshot' }
 
 type View =
   | { name: 'loading' }
   | { name: 'noBrowser'; message: string }
-  | { name: 'home' }
-  | { name: 'history' }
-  | { name: 'snapshot'; id: number; from: 'home' | 'history' }
+  | { name: 'app'; panel: Panel }
 
 function App() {
   const [view, setView] = useState<View>({ name: 'loading' })
   const [browserInfo, setBrowserInfo] = useState<BrowserInfo | null>(null)
   const [listedSnapshots, setListedSnapshots] = useState<SnapshotSummary[]>([])
+  const [selectedSnapshotId, setSelectedSnapshotId] = useState<number | null>(null)
 
   useEffect(() => {
     browserStatus()
       .then(info => {
         setBrowserInfo(info)
-        setView({ name: 'home' })
+        setView({ name: 'app', panel: { name: 'home' } })
       })
       .catch(err => setView({ name: 'noBrowser', message: String(err) }))
   }, [])
@@ -33,21 +34,49 @@ function App() {
   const checkBrowser = () => {
     setView({ name: 'loading' })
     browserStatus()
-      .then(() => setView({ name: 'home' }))
+      .then(() => setView({ name: 'app', panel: { name: 'home' } }))
       .catch(err => setView({ name: 'noBrowser', message: String(err) }))
-  }return <Layout children={
-  switch (view.name) {
-    case 'loading':
-      return <Loading />
-    case 'noBrowser':
-      return <NoBrowser message={view.message} onCheck={checkBrowser} />
-    case 'home':
-      return <Home listedSnapshots={listedSnapshots} setListedSnapshots={setListedSnapshots} />
-    case 'history':
-      return <HistoryComponent />
-    case 'snapshot':
-      return <Snapshot />
-  }} />
+  }
+
+  useEffect(() => {
+    if (selectedSnapshotId !== null) {
+      setView({ name: 'app', panel: { name: 'snapshot' } })
+    }
+  }, [selectedSnapshotId])
+
+  if (view.name === 'loading') {
+    return <Loading />
+  }
+
+  if (view.name === 'noBrowser') {
+    return <NoBrowser message={view.message} onCheck={checkBrowser} />
+  }
+
+  const renderPanel = () => {
+    switch (view.panel.name) {
+      case 'home':
+        return <Home listedSnapshots={listedSnapshots} setListedSnapshots={setListedSnapshots} />
+      case 'history':
+        return (
+          <HistoryComponent
+            listedSnapshots={listedSnapshots}
+            onSelectSnapshot={setSelectedSnapshotId}
+          />
+        )
+      case 'snapshot':
+        return selectedSnapshotId !== null ? (
+          <SnapshotComponent snapshotId={selectedSnapshotId!} />
+        ) : (
+          <p>Selecciona un snapshot en History</p>
+        )
+    }
+  }
+
+  return (
+    <Layout panel={view.panel.name} onNavigate={panel => setView({ name: 'app', panel })}>
+      {renderPanel()}
+    </Layout>
+  )
 }
 
 export default App
