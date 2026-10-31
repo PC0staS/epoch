@@ -49,12 +49,14 @@ export default function SnapshotComponent({ snapshotId }: { snapshotId: number }
       </label>
 
       <div className="min-h-[60vh] flex-1 border border-line bg-white">
-        <iframe
-          key={trusted ? 'trusted' : 'sandboxed'}
-          srcDoc={snapshot?.html_content}
-          className="h-full min-h-[60vh] w-full"
-          sandbox={trusted ? 'allow-scripts allow-same-origin' : 'allow-scripts'}
-        />
+        {snapshot && (
+          <iframe
+            key={trusted ? 'trusted' : 'sandboxed'}
+            srcDoc={snapshot?.html_content}
+            className="h-full min-h-[60vh] w-full"
+            sandbox={trusted ? 'allow-scripts allow-same-origin' : 'allow-scripts'}
+          />
+        )}
       </div>
     </div>
   )
