@@ -33,9 +33,7 @@ export default function UpdateNotice({
 
   return (
     <div className="border-t border-line pt-5">
-      <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink-soft">
-        update
-      </p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink-soft">update</p>
       <p className="mt-2 font-display text-2xl leading-none">{update.version}</p>
       {canSelf ? (
         <button
@@ -50,7 +48,7 @@ export default function UpdateNotice({
           onClick={() => openUrl(RELEASES).catch(err => setError(String(err)))}
           className="mt-4 w-full border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-soft transition-colors hover:border-accent hover:text-accent"
         >
-          ver la versión
+          view release
         </button>
       )}
       {error && <p className="mt-2 font-mono text-[10px] leading-snug text-accent">{error}</p>}

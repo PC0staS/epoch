@@ -45,7 +45,7 @@ export default function SnapshotComponent({ snapshotId }: { snapshotId: number }
           onChange={e => setTrusted(e.target.checked)}
           className="accent-accent"
         />
-        ejecutar scripts con acceso al origen
+        run scripts with origin access
       </label>
       <div className="min-h-[60vh] flex-1 border border-line bg-white">
         {snapshot && (
