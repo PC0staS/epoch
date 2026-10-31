@@ -27,7 +27,7 @@ export default function SnapshotComponent({ snapshotId }: { snapshotId: number }
       <div className="flex items-baseline justify-between gap-6 border-b border-line pb-4">
         <div className="min-w-0">
           <h2 className="truncate font-display text-2xl leading-tight">
-            {snapshot?.title ?? 'Captura'}
+            {snapshot?.title ?? 'Snapshot'}
           </h2>
           <p className="mt-1 truncate font-mono text-[11px] text-ink-soft">{snapshot?.url}</p>
         </div>
@@ -47,7 +47,6 @@ export default function SnapshotComponent({ snapshotId }: { snapshotId: number }
         />
         ejecutar scripts con acceso al origen
       </label>
-
       <div className="min-h-[60vh] flex-1 border border-line bg-white">
         {snapshot && (
           <iframe

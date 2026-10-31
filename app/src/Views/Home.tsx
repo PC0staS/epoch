@@ -12,7 +12,7 @@ export default function Home({
   const [url, setUrl] = useState('')
   const [customPath, setCustomPath] = useState('')
   const [showCustomPathInput, setShowCustomPathInput] = useState(false)
-  const last5Snapshots = listedSnapshots.slice(-5)
+  const last5Snapshots = listedSnapshots.slice(0, 5)
 
   const handleToggleCustomPathInput = () => {
     setShowCustomPathInput(!showCustomPathInput)
@@ -41,12 +41,12 @@ export default function Home({
     <div>
       <section className="animate-rise">
         <h2 className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink-soft">
-          nueva captura
+          new snapshot
         </h2>
         <div className="mt-4 flex items-end gap-4">
           <input
             type="text"
-            placeholder="https://ejemplo.com"
+            placeholder="https://example.com"
             className="min-w-0 flex-1 border-b border-line bg-transparent py-3 font-mono text-lg outline-none transition-colors placeholder:text-ink-soft/50 focus:border-accent"
             value={url}
             onChange={e => setUrl(e.target.value)}
@@ -55,14 +55,14 @@ export default function Home({
             className="shrink-0 bg-ink px-6 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-paper transition-colors hover:bg-accent"
             onClick={handleCapture}
           >
-            Guardar
+            Save
           </button>
         </div>
         <button
           className="mt-5 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-soft underline decoration-line underline-offset-4 transition-colors hover:text-accent"
           onClick={handleToggleCustomPathInput}
         >
-          {showCustomPathInput ? 'usar el detectado' : 'usar otro navegador'}
+          {showCustomPathInput ? 'use detected' : 'use another browser'}
         </button>
         {showCustomPathInput && (
           <input
@@ -78,7 +78,7 @@ export default function Home({
       {last5Snapshots.length > 0 && (
         <section className="animate-rise mt-16" style={{ animationDelay: '120ms' }}>
           <h2 className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink-soft">
-            últimas capturas
+            latest snapshots
           </h2>
           <ul className="mt-4 divide-y divide-line border-y border-line">
             {last5Snapshots.map(snapshot => (

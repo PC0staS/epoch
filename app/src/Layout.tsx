@@ -1,9 +1,9 @@
 import { openUrl } from '@tauri-apps/plugin-opener'
 
 const PANELS = [
-  { name: 'home', label: 'Inicio' },
-  { name: 'history', label: 'Historial' },
-  { name: 'snapshot', label: 'Captura' },
+  { name: 'home', label: 'Home' },
+  { name: 'history', label: 'History' },
+  { name: 'snapshot', label: 'Snapshot' },
 ] as const
 
 type PanelName = (typeof PANELS)[number]['name']
@@ -25,7 +25,7 @@ export default function Layout({
         <div className="flex items-center justify-between px-8 py-5">
           <h1 className="font-display text-3xl tracking-tight">Epoch</h1>
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink-soft">
-            archivo personal de la web
+            personal web archive
           </p>
         </div>
       </header>

@@ -42,10 +42,10 @@ export default function HistoryComponent({
     <div className="animate-rise">
       <div className="flex items-baseline justify-between">
         <h2 className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink-soft">
-          {filteredSnapshots.length} capturas
+          {filteredSnapshots.length} snapshots
         </h2>
         <input
-          placeholder="Buscar..."
+          placeholder="Search..."
           className="bg-transparent border-b border-line py-1 text-sm focus:outline-none focus:border-accent"
           value={filter}
           onChange={e => setFilter(e.target.value)}
@@ -61,7 +61,7 @@ export default function HistoryComponent({
                   : 'text-ink-soft hover:text-ink'
               }
             >
-              {option === 'table' ? 'lista' : 'calendario'}
+              {option === 'table' ? 'list' : 'calendar'}
             </button>
           ))}
         </div>
@@ -114,7 +114,7 @@ export default function HistoryComponent({
                   e.preventDefault()
                   deleteSnapshot(snapshot.id)
                 }}
-                title="borrar"
+                title="delete"
                 className="shrink-0 font-mono text-xs text-ink-soft opacity-0 transition-opacity hover:text-accent group-hover:opacity-100"
               >
                 ✕
