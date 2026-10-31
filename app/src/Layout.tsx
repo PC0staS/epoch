@@ -1,3 +1,5 @@
+import { openUrl } from '@tauri-apps/plugin-opener'
+
 const PANELS = [
   { name: 'home', label: 'Home' },
   { name: 'history', label: 'History' },
@@ -18,7 +20,7 @@ export default function Layout({
   return (
     <div className="flex min-h-screen flex-col bg-paper text-ink">
       <header className="border-b border-line">
-        <div className="flex items-baseline justify-between px-8 py-6">
+        <div className="flex items-center justify-between px-8 py-5">
           <h1 className="font-display text-3xl tracking-tight">Epoch</h1>
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink-soft">
             archivo personal de la web
@@ -49,10 +51,16 @@ export default function Layout({
         </aside>
         <main className="min-h-0 flex-1 overflow-auto px-10 py-8">{children}</main>
       </div>
-      <footer className="border-t border-line px-8 py-3">
+      <footer className="flex items-baseline justify-between border-t border-line px-8 py-3">
         <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink-soft">
           Epoch · {new Date().getFullYear()}
         </p>
+        <button
+          onClick={() => openUrl('https://github.com/PC0staS')}
+          className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink-soft transition-colors hover:text-accent"
+        >
+          github.com/PC0staS
+        </button>
       </footer>
     </div>
   )

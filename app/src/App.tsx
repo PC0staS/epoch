@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { BrowserInfo, SnapshotSummary } from './models'
+import { SnapshotSummary } from './models'
 import { browserStatus } from './api'
 import Loading from './Views/Loading'
 import NoBrowser from './Views/NoBrowser'
@@ -18,14 +18,12 @@ type View =
 
 function App() {
   const [view, setView] = useState<View>({ name: 'loading' })
-  const [browserInfo, setBrowserInfo] = useState<BrowserInfo | null>(null)
   const [listedSnapshots, setListedSnapshots] = useState<SnapshotSummary[]>([])
   const [selectedSnapshotId, setSelectedSnapshotId] = useState<number | null>(null)
 
   useEffect(() => {
     browserStatus()
-      .then(info => {
-        setBrowserInfo(info)
+      .then(() => {
         setView({ name: 'app', panel: { name: 'home' } })
       })
       .catch(err => setView({ name: 'noBrowser', message: String(err) }))
