@@ -42,7 +42,7 @@ pub enum DetectError {
 }
 
 pub fn detect_browser(custom_browser: &str) -> Result<BrowserInfo, DetectError> {
-    let browsers = vec![
+    let mut browsers = vec![
         (custom_browser, BrowserKind::Chromium), // Intentamos primero con el path personalizado proporcionado
         ("chromium", BrowserKind::Chromium),
         ("chromium-browser", BrowserKind::Chromium),
@@ -53,6 +53,27 @@ pub fn detect_browser(custom_browser: &str) -> Result<BrowserInfo, DetectError> 
         ("brave-browser", BrowserKind::Brave),
         ("brave", BrowserKind::Brave),
     ];
+
+    // Los .app de macOS no exponen sus binarios en PATH: hay que ir al bundle.
+    #[cfg(target_os = "macos")]
+    browsers.extend([
+        (
+            "/Applications/Chromium.app/Contents/MacOS/Chromium",
+            BrowserKind::Chromium,
+        ),
+        (
+            "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
+            BrowserKind::Brave,
+        ),
+        (
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            BrowserKind::Chrome,
+        ),
+        (
+            "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+            BrowserKind::Edge,
+        ),
+    ]);
 
     let mut failures: Vec<String> = Vec::new();
 
@@ -108,6 +129,11 @@ fn parse_version(version_str: &str) -> Option<String> {
 }
 
 fn resolve_in_path(cmd: &str) -> Option<PathBuf> {
+    // Si el comando es una ruta absoluta, verificamos si es un archivo ejecutable.
+    let direct = PathBuf::from(cmd);
+    if direct.is_absolute() {
+        return direct.is_file().then_some(direct);
+    }
     let path = std::env::var_os("PATH")?;
     for dir in std::env::split_paths(&path) {
         let candidate = dir.join(cmd);
