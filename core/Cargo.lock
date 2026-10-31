@@ -479,7 +479,7 @@ dependencies = [
 
 [[package]]
 name = "epoch-core"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "chromiumoxide",
  "chrono",
