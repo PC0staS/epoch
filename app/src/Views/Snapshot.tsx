@@ -27,7 +27,7 @@ export default function SnapshotComponent({ snapshotId }: { snapshotId: number }
       <div className="flex items-baseline justify-between gap-6 border-b border-line pb-4">
         <div className="min-w-0">
           <h2 className="truncate font-display text-2xl leading-tight">
-            {snapshot?.title ?? 'Snapshot'}
+            {snapshot?.title ?? 'Captura'}
           </h2>
           <p className="mt-1 truncate font-mono text-[11px] text-ink-soft">{snapshot?.url}</p>
         </div>

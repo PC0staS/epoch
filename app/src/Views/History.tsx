@@ -23,8 +23,15 @@ export default function HistoryComponent({
 }) {
   const [mode, setMode] = useState<'table' | 'calendar'>('table')
   const [date, setDate] = useState(new Date())
+  const [filter, setFilter] = useState('')
+  const filteredSnapshots = listedSnapshots.filter(
+    snapshot =>
+      snapshot.title?.toLowerCase().includes(filter.toLowerCase()) ||
+      snapshot.url.toLowerCase().includes(filter.toLowerCase()) ||
+      snapshot.captured_at.includes(filter),
+  )
 
-  const events = listedSnapshots.map(snapshot => ({
+  const events = filteredSnapshots.map(snapshot => ({
     id: snapshot.id,
     title: snapshot.title ?? snapshot.url,
     start: new Date(snapshot.captured_at),
@@ -32,11 +39,17 @@ export default function HistoryComponent({
   }))
 
   return (
-    <div className="animate-rise max-w-4xl">
+    <div className="animate-rise">
       <div className="flex items-baseline justify-between">
         <h2 className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink-soft">
-          {listedSnapshots.length} capturas
+          {filteredSnapshots.length} capturas
         </h2>
+        <input
+          placeholder="Buscar..."
+          className="bg-transparent border-b border-line py-1 text-sm focus:outline-none focus:border-accent"
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+        />
         <div className="flex gap-4 font-mono text-[10px] uppercase tracking-[0.2em]">
           {(['table', 'calendar'] as const).map(option => (
             <button
@@ -72,7 +85,7 @@ export default function HistoryComponent({
         </div>
       ) : (
         <ul className="mt-4 divide-y divide-line border-y border-line">
-          {listedSnapshots.map(snapshot => (
+          {filteredSnapshots.map(snapshot => (
             <li key={snapshot.id} className="group flex items-baseline gap-4 py-3">
               <span className="w-10 shrink-0 font-mono text-[10px] tabular-nums text-ink-soft">
                 #{snapshot.id}

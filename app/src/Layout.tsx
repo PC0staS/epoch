@@ -1,9 +1,9 @@
 import { openUrl } from '@tauri-apps/plugin-opener'
 
 const PANELS = [
-  { name: 'home', label: 'Home' },
-  { name: 'history', label: 'History' },
-  { name: 'snapshot', label: 'Snapshot' },
+  { name: 'home', label: 'Inicio' },
+  { name: 'history', label: 'Historial' },
+  { name: 'snapshot', label: 'Captura' },
 ] as const
 
 type PanelName = (typeof PANELS)[number]['name']

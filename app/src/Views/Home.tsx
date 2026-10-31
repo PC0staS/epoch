@@ -38,7 +38,7 @@ export default function Home({
       })
   }
   return (
-    <div className="max-w-3xl">
+    <div>
       <section className="animate-rise">
         <h2 className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink-soft">
           nueva captura
