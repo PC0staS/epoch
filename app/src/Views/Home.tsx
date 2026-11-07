@@ -52,7 +52,7 @@ export default function Home({
             onChange={e => setUrl(e.target.value)}
           />
           <button
-            className="shrink-0 bg-ink px-6 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-paper transition-colors hover:bg-accent"
+            className="shrink-0 bg-ink px-6 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-paper transition-colors hover:bg-accent cursor-pointer"
             onClick={handleCapture}
           >
             Save
